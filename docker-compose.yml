@@ -1,0 +1,26 @@
+services:
+  binarybuilder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: libsemigroups-builder
+    container_name: libsemigroups-builder
+    # BinaryBuilder needs privileged mode for user namespaces
+    privileged: true
+    volumes:
+      # Mount the project directory
+      - .:/workspace
+      # Persist Julia packages between runs
+      - julia-depot:/root/.julia
+      # Mount Docker socket for nested container builds (optional)
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /workspace
+    environment:
+      # Accept Apple SDK license for macOS cross-compilation
+      - BINARYBUILDER_AUTOMATIC_APPLE=true
+    # Keep container running for interactive use
+    stdin_open: true
+    tty: true
+
+volumes:
+  julia-depot:
